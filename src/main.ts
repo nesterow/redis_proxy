@@ -19,7 +19,7 @@ function main() {
     http_proxy.listen(HTTP_PROXY_PORT, () => {
 
         console.log("👍  HTTP Proxy is listening on ::" + HTTP_PROXY_PORT)
-        
+
     })
 }
 
