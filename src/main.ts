@@ -4,7 +4,7 @@ config({ path: resolve(__dirname, '../config.env') })
 
 import * as redis from 'redis'
 
-import HTTPProxy from './proxy/HTTPProxy' 
+import HTTPProxy from './Proxy/HTTPProxy' 
 const {HTTP_PROXY_PORT, REDIS_URL} = process.env
 
 
@@ -17,7 +17,9 @@ function main() {
     
     const http_proxy = new HTTPProxy(redisClient)
     http_proxy.listen(HTTP_PROXY_PORT, () => {
+
         console.log("👍  HTTP Proxy is listening on ::" + HTTP_PROXY_PORT)
+        
     })
 }
 

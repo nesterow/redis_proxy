@@ -1,6 +1,7 @@
 import CacheItem from './CacheItem'
+import { EventEmitter } from 'events'
 
-class TLRUCache {
+class TLRUCache extends EventEmitter {
     /**
      * 
      * Time aware Least Recently Used
@@ -23,9 +24,21 @@ class TLRUCache {
     items: { [key: string]: CacheItem }
 
     constructor(capacity: number = Infinity, rip_seconds: number = 0) {
+        super()
         this.items = {}
         this.capacity = capacity
         this.rip = rip_seconds * 1000
+        
+        // now we might need to syncronize the cache
+        // among workers in the cluster.
+        // In this case, I am against this approach,
+        // since it would duplicate the same cache in the memory
+        // I suggest to find a method to keep cache instance only inside
+        // the master process
+        this.on('sync', (item: CacheItem) => {
+            this.set(item.key, item.value)
+        })
+    
     }
 
     get(key: string): string {
