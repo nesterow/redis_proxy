@@ -1,5 +1,6 @@
 import CacheItem from './CacheItem'
 import { EventEmitter } from 'events'
+import Logger from '../Utils/Logger'
 
 class TLRUCache extends EventEmitter {
     /**
@@ -25,6 +26,8 @@ class TLRUCache extends EventEmitter {
 
     constructor(capacity: number = Infinity, rip_seconds: number = 0) {
         super()
+        Logger.debug('TLRUCache: initializing cache')
+        
         this.items = {}
         this.capacity = capacity
         this.rip = rip_seconds * 1000
@@ -34,27 +37,33 @@ class TLRUCache extends EventEmitter {
         // In this case, I am against this approach,
         // since it would duplicate the same cache in the memory
         // I suggest to find a method to keep cache instance only inside
-        // the master process
+        // the master process, or decouple it from the proxy
         this.on('sync', (item: CacheItem) => {
             this.set(item.key, item.value)
+            Logger.debug(`TLRUCache:on +sync -> ${item.key}`)
         })
     
     }
 
     get(key: string): string {
+        Logger.debug(`TLRU Cache:get() +get -> ${key}`)
         const item: CacheItem = this.items[key]
-        if (item) 
-            return this.swapHead(item)
+        if (item) {
+            this.swapHead(item)
+            return item.value
+        }
         return undefined
     }
 
     set(key: string, value: any) {
+        Logger.debug(`TLRU Cache:set() +set -> ${key}`)
         let item: CacheItem = this.items[key]
         if (!item) {
             this.dispose()
             item = new CacheItem(key, value, this.rip)
             this.items[key] = item
-            return this.swapHead(item)
+            this.swapHead(item)
+            return item.value
         }
     }
 
@@ -64,6 +73,7 @@ class TLRUCache extends EventEmitter {
          * we'll go in reverse order from least to the recent
          * also break the loop if current time < expiry time
          */
+        Logger.debug(`TLRU Cache:validate() +purge expired`)
         process.nextTick(() => {
             const time: number = new Date().getTime()
             let item: CacheItem = this.tail
@@ -82,6 +92,7 @@ class TLRUCache extends EventEmitter {
     // and delete references to get it garbage-collected
     delete(key: string) {
         const item = this.items[key]
+        Logger.debug(`TLRU Cache:delete() +delete -> ${key}`)
         if (item) {
             this.takeOut(item)
             if (this.tail === item) 

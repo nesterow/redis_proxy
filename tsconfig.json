@@ -5,7 +5,11 @@
         "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
-        "sourceMap": false
+        "sourceMap": false,
+        "rootDirs": [
+            ".",
+            "./src"
+        ]
     },
     "include": [
         "src/**/*"

@@ -1,5 +1,5 @@
 import * as expect from 'expect';
-import TLRUCache from './TLRUCache'
+import TLRUCache from './Cache'
 
 describe("TLRUCache: Test cache core functionality:", () => {
 
