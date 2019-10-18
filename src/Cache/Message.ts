@@ -1,7 +1,8 @@
 
 export enum MessageType {
     GET = 'get',
-    SET = 'set'
+    SET = 'set',
+    STATS = 'stats'
 }
 
 export interface RequestMessage {

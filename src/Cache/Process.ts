@@ -11,14 +11,15 @@ const Cache: TLRUCache = new TLRUCache(
     parseInt(PROXY_CACHE_EXPIRY)
 )
 
+
 /**
  * Handle get/set operations
  * @param message 
  */
 function handler(message: RequestMessage) {
     if (!('type' in message)) return;
-    const key = message.data.key
-    const value = message.data.value
+    const key = message.data ? message.data.key : null
+    const value = message.data ? message.data.value : null
     switch(message.type) {
         case MessageType.GET:
             const getResult = Cache.get(key)
@@ -28,6 +29,7 @@ function handler(message: RequestMessage) {
                 isResponse: true
             }
             process.send(getRes)
+            break;
         case MessageType.SET:
             const setResult = Cache.set(key, value)
             const setRes: ResponseMessage = {
@@ -36,6 +38,20 @@ function handler(message: RequestMessage) {
                 isResponse: true
             }
             process.send(setRes)
+            break;
+        case MessageType.STATS:
+            const stats = {
+                memoryUsage: process.memoryUsage(),
+                cpuUsage: process.cpuUsage(),
+                length: Cache.length
+            }
+            const statsRes: ResponseMessage = {
+                id: message.id,
+                data: stats,
+                isResponse: true
+            }
+            process.send(statsRes)
+            break;
     }
 }
 

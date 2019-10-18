@@ -23,6 +23,10 @@ export async function set(key: string, value: string) {
     return await send(MessageType.SET, { key, value })
 }
 
+export async function stats() {
+    return await send(MessageType.STATS, null)
+}
+
 function send(type: MessageType, message: any) {
     return new Promise((resolve, reject) => {
         const req: RequestMessage = {

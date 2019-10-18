@@ -38,7 +38,7 @@ class TLRUCache extends EventEmitter {
         // since it would duplicate the same cache in the memory
         // I suggest to find a method to keep cache instance only inside
         // the master process, or decouple it from the proxy
-        this.on('sync', (item: CacheItem) => {
+        this.on('sync_workers', (item: CacheItem) => {
             this.set(item.key, item.value)
             Logger.debug(`TLRUCache:on +sync -> ${item.key}`)
         })
@@ -56,6 +56,7 @@ class TLRUCache extends EventEmitter {
     }
 
     set(key: string, value: any) {
+        if (!value) return;
         Logger.debug(`TLRU Cache:set() +set -> ${key}`)
         let item: CacheItem = this.items[key]
         if (!item) {

@@ -11,14 +11,20 @@ services:
       - '6379:6379'
     volumes:
       - 'redis_data:/bitnami/redis/data'
-  # node:
-  #   tty: true # Enables debugging capabilities when attached to this container.
-  #   image: 'bitnami/node:12'
-  #   command: sh -c 'npm start'
-  #   ports:
-  #     - 3000:3000
-  #   volumes:
-  #     - .:/app
+    container_name: redis
+  node:
+    depends_on: 
+      - redis
+    tty: true # Enables debugging capabilities when attached to this container.
+    image: 'bitnami/node:12'
+    command: sh -c 'npm install && npm run build && npm start'
+    links:
+      - redis:redis
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/app
+    container_name: proxy
 
 volumes:
   redis_data:

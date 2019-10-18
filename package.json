@@ -4,11 +4,11 @@
   "description": "A Resis Proxy",
   "main": "build/server.js",
   "scripts": {
-    "start": "node build/main.js",
-    "dev": "nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/main.ts",
+    "start": "NODE_ENV=prod node build/main.js",
+    "dev": "NODE_ENV=test nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/main.ts",
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && NODE_ENV=test ts-mocha -p tsconfig.json src/**/*.spec.ts",
-    "test:e2e": "ts-mocha -p tsconfig.json test/**/*.spec.ts"
+    "test:e2e": "npm run build && NODE_ENV=test ts-mocha -p tsconfig.json src/e2e.test.ts"
   },
   "author": "nesterow",
   "license": "ISC",
@@ -26,10 +26,12 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.11.1",
     "@types/redis": "^2.8.14",
+    "@types/supertest": "^2.0.8",
     "@types/uuid": "^3.4.5",
     "expect": "^24.9.0",
     "mocha": "^6.2.1",
     "nodemon": "^1.19.3",
+    "supertest": "^4.0.2",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.4.1",
     "typescript": "^3.6.4"
