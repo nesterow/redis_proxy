@@ -53,4 +53,4 @@ The proxy service conists of two key components: **Cache** and **Proxy**
 - [X] Proxy Stats
 - [X] Documentation
 - [ ] Bonus: cluster mode 
-- [ ] Bonus: redis protocol proxy
+- [ ] Bonus: redis protocol proxy (30%)
