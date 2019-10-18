@@ -1,5 +1,5 @@
 ## Redis Proxy
-HTTP Proxy and caching layer for Redis 'GET' commnad written in TypeScript
+HTTP Proxy and caching layer for Redis `GET` command written in TypeScript
 
 ### Usage
 ```bash
@@ -23,8 +23,8 @@ PROXY_CACHE_CAPACITY=1024          # cache capacity as number of entries
 ```
 
 ### Rest API
-- 'GET /' - returns usage information for the cache instance and http proxy
-- 'GET /GET/{key}' - returns value associated with the key or 404 if value  dosn't exist on either cache or redis instance
+- `GET /` - returns usage information for the cache instance and http proxy
+- `GET /GET/{key}` - returns value associated with the key or 404 if value  dosn't exist on either cache or redis instance
 
 
 ### Architecture
@@ -42,7 +42,7 @@ The proxy service conists of two key components: **Cache** and **Proxy**
 - TCP Proxy is in todo list, since it requires to implement a subset of redis protocol.
 
 ### Complexity
-- For cache oprations like retrieval, insertion and deletion - `O(1)`
+- For cache operations like retrieval, insertion and deletion - `O(1)`
 - For cache invalidation the complicity is `O(n1)`, this is additional operation scheduled in periods of cache expiration time
 - For https proxy, worst case would be retrieval operation from redis when the entity is stored on disk - `O(1+n1)`
 
