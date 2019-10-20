@@ -5,8 +5,8 @@ configure(path.resolve(__dirname,'..'))
 import Logger from './Utils/Logger'
 import * as redis from 'redis'
 import HTTPProxy from './Proxy/HTTPProxy' 
-
-const {HTTP_PROXY_PORT, REDIS_URL} = process.env
+import TCPProxy from './Proxy/TCPProxy'
+const {TCP_PROXY_PORT, HTTP_PROXY_PORT, REDIS_URL} = process.env
 
 
 const redisClient = redis.createClient({url: REDIS_URL})
@@ -19,7 +19,11 @@ const main = () => {
     http_proxy.listen(HTTP_PROXY_PORT, () => {
         Logger.info("👍  HTTP Proxy is listening on ::" + HTTP_PROXY_PORT)
     })
-
+    
+    const redis_proxy = new TCPProxy(REDIS_URL)
+    redis_proxy.listen(parseInt(TCP_PROXY_PORT), () => {
+        Logger.info("👍  TCP Proxy is listening on ::" + TCP_PROXY_PORT)
+    })
     return http_proxy
 }
 
