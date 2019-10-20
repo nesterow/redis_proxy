@@ -49,7 +49,7 @@ The proxy service conists of two key components: **Cache** and **Proxy**
 
 ### Additional Notes
 1. Time spent:
-    - I started this task 4 days ago and I could spare at most 3 hours per day.
+    - I finished the task in 4 days and I could spare at most 3 hours per day.
     - About 30% of time was spent searching/reading documentation. 
     - ~20% I was implementing the Cache module
     - ~40% I was implementing Redis protocol proxy
