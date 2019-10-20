@@ -2,20 +2,28 @@ import IProxy from './IProxy'
 import * as net from 'net'
 
 import Protocol from './Protocol'
+import * as url from 'url'
 import {get, set} from '../Cache/Worker'
+
 
 class TCPProxy implements IProxy {
     
     socket: net.Socket
+    remotePort: number
+    remoteHost: string
 
-    constructor() {}
+    constructor(redis_url: string = 'redis://127.0.0.1:6379/1') {
+        const urlParts = url.parse(redis_url)
+        this.remoteHost = urlParts.hostname
+        this.remotePort = parseInt(urlParts.port)
+    }
 
     handler = async (requestMessage: Buffer) => {
         
         const sendRequest = (message: Buffer): any => new Promise((resolve, reject)=>{
             if (!message.length) resolve(message) // return empty buffer
             const proxySocket: net.Socket = new net.Socket()
-            proxySocket.connect(6379, '127.0.0.1', () => {
+            proxySocket.connect(this.remotePort, this.remoteHost, () => {
                 proxySocket.write(message)
                 proxySocket.on('data', (response: Buffer) => {
                     resolve(response)
@@ -59,7 +67,6 @@ class TCPProxy implements IProxy {
             const cmd = requestBatch[i].toString()
             const cachedValue = cached[cmd]
             if (cachedValue) {
-                //console.log('cached >>>>', cachedValue)
                 responseBatch.push(cachedValue)
                 continue
             }
@@ -73,10 +80,8 @@ class TCPProxy implements IProxy {
             responseBatch.push(redisValue)
         }
 
-        //console.log('-=-=-=-=\n', Protocol.encodeResponse(responseBatch).toString(), response.toString())
         this.socket.write(Protocol.encodeResponse(responseBatch))
-        
-        
+         
     }
 
     listen(port: number, cb: any) {

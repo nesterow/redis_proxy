@@ -7,10 +7,9 @@ import {fork, ChildProcess} from 'child_process'
 import {resolve} from 'path'
 import * as uuid from 'uuid/v4'
 import {RequestMessage, ResponseMessage, MessageType} from './Message'
+const {NODE_ENV} = process.env
 
-const {NODE_ENV} = process.env;
-
-const dir = NODE_ENV === 'test' ?  resolve(__dirname, '..', '..', 'build', 'cache') : __dirname;
+const dir = ['test', 'dev'].includes(NODE_ENV) ?  resolve(__dirname, '..', '..', 'build', 'cache') : __dirname;
 
 const workerProcess: ChildProcess = fork(resolve(dir, 'Process.js'))
 
