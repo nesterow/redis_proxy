@@ -68,7 +68,7 @@ The proxy service conists of two key components: **Cache** and **Proxy**
 
 ### Changelog
 
-- v1.0.1
+##### v1.0.1
 Changes based on provided feedback:
 1. Now Linked List implementation is in separate class and later I will move it in a separate npm module [#2](https://github.com/nesterow/redis_proxy/issues/2)
 2. Tests are rewritten in more consistent way [#1](https://github.com/nesterow/redis_proxy/issues/1)
