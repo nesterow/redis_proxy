@@ -1,11 +1,10 @@
 import * as express from "express"
 import {Request, Response} from "express"
-import IProxy from './IProxy'
 import { RedisClient } from "redis"
 import Logger from '../Utils/Logger'
 import {get, set, stats} from '../Cache/Worker'
 
-class HTTPProxy implements IProxy {
+class HTTPProxy {
     
     app: express.Application
     redis: RedisClient

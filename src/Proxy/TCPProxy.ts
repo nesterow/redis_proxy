@@ -1,12 +1,12 @@
-import IProxy from './IProxy'
+
 import * as net from 'net'
 
-import Protocol from './Protocol'
+import * as RedisProtocol from './RedisProtocol'
 import * as url from 'url'
 import {get, set} from '../Cache/Worker'
 
 
-class TCPProxy implements IProxy {
+class TCPProxy {
     
     socket: net.Socket
     remotePort: number
@@ -36,13 +36,13 @@ class TCPProxy implements IProxy {
             })
         })
 
-        const requestBatch: any[] = Protocol.decodeRequest(requestMessage)
+        const requestBatch: any[] = RedisProtocol.decodeRequest(requestMessage)
         let cached: any = {}
         const filtered: any[] = []
         
         for (let i = 0; i < requestBatch.length; i++) {
             const cmd = requestBatch[i]
-            if (Protocol.isCacheable(cmd)) {
+            if (RedisProtocol.isCacheable(cmd)) {
                 const [c, key] = cmd
                 const cache = await get(key)
                 if (cache)
@@ -53,11 +53,11 @@ class TCPProxy implements IProxy {
                 filtered.push(cmd)
             }
         }
-        const request: Buffer = Protocol.encodeRequest(filtered)
+        const request: Buffer = RedisProtocol.encodeRequest(filtered)
         const response: Buffer = await sendRequest(request)
 
         const fromRedis: any = {}
-        Protocol.associate(request, response).map((item: any[]) => {
+        RedisProtocol.associate(request, response).map((item: any[]) => {
             const [cmd, value] = item
             fromRedis[cmd.toString()] = value
         })
@@ -71,7 +71,7 @@ class TCPProxy implements IProxy {
                 continue
             }
             const redisValue = fromRedis[cmd]
-            if (!Protocol.isCacheable(requestBatch[i])) {
+            if (!RedisProtocol.isCacheable(requestBatch[i])) {
                 responseBatch.push(redisValue)
                 continue
             }
@@ -80,7 +80,7 @@ class TCPProxy implements IProxy {
             responseBatch.push(redisValue)
         }
 
-        this.socket.write(Protocol.encodeResponse(responseBatch))
+        this.socket.write(RedisProtocol.encodeResponse(responseBatch))
          
     }
 

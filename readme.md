@@ -66,3 +66,11 @@ The proxy service conists of two key components: **Cache** and **Proxy**
 - [X] Bonus: redis protocol proxy
 - [ ] Bonus: cluster mode 
 
+### Changelog
+
+- v1.0.1
+Changes based on provided feedback:
+1. Now Linked List implementation is in separate class and later I will move it in a separate npm module [#2](https://github.com/nesterow/redis_proxy/issues/2)
+2. Tests are rewritten in more consistent way [#1](https://github.com/nesterow/redis_proxy/issues/1)
+3. Fixed naming in Redis Protocol module  [#3](https://github.com/nesterow/redis_proxy/issues/3)
+

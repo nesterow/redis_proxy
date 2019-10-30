@@ -1,6 +1,27 @@
-import CacheItem from './CacheItem'
 import { EventEmitter } from 'events'
 import Logger from '../Utils/Logger'
+
+import LinkedList from './LinkedList'
+
+class CacheItem {
+    /**
+     * CacheItem
+     * Keeps expiry time for a cache item
+     */
+
+    next: CacheItem | undefined
+    prev: CacheItem | undefined
+
+    key: string
+    value: string
+    expiryTime: number
+
+    constructor(key: string, value: string, rip_miliseconds: number|undefined = 0){
+        this.key = key
+        this.value = value
+        this.expiryTime = new Date().getTime() + rip_miliseconds
+    }
+}
 
 class TLRUCache extends EventEmitter {
     /**
@@ -20,14 +41,14 @@ class TLRUCache extends EventEmitter {
     capacity: number = Infinity
     rip: number = 0 // retained information period (miliseconds)
 
-    head: CacheItem
-    tail: CacheItem
+    cache: LinkedList
     items: { [key: string]: CacheItem }
 
     constructor(capacity: number = Infinity, rip_seconds: number = 0) {
         super()
         Logger.debug('TLRUCache: initializing cache')
         
+        this.cache = new LinkedList()
         this.items = {}
         this.capacity = capacity
         this.rip = rip_seconds * 1000
@@ -77,7 +98,7 @@ class TLRUCache extends EventEmitter {
         Logger.debug(`TLRU Cache:validate() +purge expired`)
         process.nextTick(() => {
             const time: number = new Date().getTime()
-            let item: CacheItem = this.tail
+            let item: CacheItem = this.cache.tail
             while (item) {
                 if (item.expiryTime <= time)
                     this.delete(item.key)
@@ -95,70 +116,29 @@ class TLRUCache extends EventEmitter {
         const item = this.items[key]
         Logger.debug(`TLRU Cache:delete() +delete -> ${key}`)
         if (item) {
-            this.takeOut(item)
-            if (this.tail === item) 
-                this.tail = this.tail.prev
-            if (this.head === item)
-                this.head = this.head.next
+            this.cache.delete(item)
             delete this.items[key]
         }
     }
-    
-    // take out an item from its  position
-    // and interlink its neighbours
-    takeOut(item: CacheItem) {
-        const prev = item.prev
-        const next = item.next
-        if (prev) prev.next = next
-        if (next) next.prev = prev
-    }
+
 
     // put an item to the head
     swapHead(item: CacheItem) {
-
-        if (!this.head)
-            this.head = item
-
-        const head = this.head
-        if (item !== head) {
-            
-            this.takeOut(item)
-
-            item.next = head
-            head.prev = item
-            this.head = item
-
-            if (!this.tail) {
-                this.tail = item.next
-                this.tail.next = undefined
-            }
-            if (this.tail === this.head) 
-                this.cutTail()
-
-            this.head.prev = undefined
-            this.tail.next = undefined
-        }
-        this.head.expiryTime = new Date().getTime() + this.rip
-        return this.head.value
+        const node = this.cache.delete(item)
+        this.cache.unshift(node)
+        this.cache.head.expiryTime = new Date().getTime() + this.rip
+        return this.cache.head.value
     }
 
     dispose() {
         // cut the tail if cache is over capacity
         if (this.length >= this.capacity) {
             do {
-                const tail = this.cutTail()
+                const tail = this.cache.pop() as CacheItem
                 delete this.items[tail.key]
             } 
             while (this.length >= this.capacity)
         }
-    }
-
-    cutTail(){
-        const tail = this.tail
-        this.tail = tail.prev
-        this.tail.next = undefined
-        tail.prev = undefined
-        return tail
     }
 
     //@ts-ignore
